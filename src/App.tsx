@@ -21,13 +21,13 @@ const detectProviderAndSigner = async () => {
 };
 
 function App() {
-  const [signer, setSigner] = useState<ethers.JsonRpcSigner | null>(null);
+  const [signer, setSigner] = useState<ethers.JsonRpcSigner | ethers.BrowserProvider | ethers.AbstractProvider | null>(null);
   const [provider, setProvider] = useState<
-    ethers.BrowserProvider | ethers.AbstractProvider | null
+   ethers.BrowserProvider | ethers.AbstractProvider | ethers.JsonRpcSigner | null
   >(null);
   const [network, setNetwork] = useState<Network>();
 
-  const { symbol, decimals, totalSupply } = useUsdtContract(provider);
+  const { symbol, decimals, totalSupply, balance, allowance, name, owner } = useUsdtContract(provider);
 
   useEffect(() => {
     detectProviderAndSigner().then(([_provider, _signer]) => {
@@ -38,8 +38,9 @@ function App() {
 
   useEffect(() => {
     async function getNetwork() {
-      if (provider) {
+      if (provider instanceof ethers.BrowserProvider) {
         const _network = await provider.getNetwork();
+        console.log({ _network });
         return _network;
       } else {
         return undefined;
@@ -55,6 +56,11 @@ function App() {
       <p>Symbol: {symbol}</p>
       <p>decimals: {decimals}</p>
       <p>Total Supply: {formatUnits(totalSupply, decimals)}</p>
+      <p>Balance: {formatUnits(balance, decimals)}</p>
+      <p>Allowance: {formatUnits(allowance, decimals)}</p>
+      <p>Name: {name}</p>
+      <p>Owner: {owner}</p>
+
     </>
   );
 }
